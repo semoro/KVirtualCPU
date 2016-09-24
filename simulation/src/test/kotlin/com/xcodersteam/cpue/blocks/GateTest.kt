@@ -1,8 +1,7 @@
 package com.xcodersteam.cpue.blocks
 
 import com.xcodersteam.cpue.Simulation.power
-import junit.framework.Assert.assertFalse
-import junit.framework.Assert.assertTrue
+import junit.framework.Assert.*
 import org.junit.Test
 
 /**
@@ -26,7 +25,25 @@ class GateTest : AbstractSimulationTest() {
     }
 
     @Test
-    fun testAndGate() {
+    fun testNORGate() {
+        val gate = NORGate()
+        val t = truthTable(
+                arrayOf(0, 0) to arrayOf(1),
+                arrayOf(0, 1) to arrayOf(0),
+                arrayOf(1, 0) to arrayOf(0),
+                arrayOf(1, 1) to arrayOf(0)
+        )
+        t.test {
+            simulateNSteps(3) {
+                gate.a.power = inputs[0]
+                gate.b.power = inputs[1]
+            }
+            assertEquals(outputs[0], gate.c.power)
+        }
+    }
+
+    @Test
+    fun testANDGate() {
         val gate = ANDGate()
         simulateNSteps(10) {
             gate.a.power = true
@@ -44,7 +61,7 @@ class GateTest : AbstractSimulationTest() {
     }
 
     @Test
-    fun testOrGate() {
+    fun testORGate() {
         val gate = ORGate()
         simulateNSteps(10) {
             gate.a.power = true
@@ -64,7 +81,7 @@ class GateTest : AbstractSimulationTest() {
     }
 
     @Test
-    fun testXorGate() {
+    fun testXORGate() {
         val gate = XORGate()
         simulateNSteps(10) {
             gate.a.power = true
@@ -84,7 +101,7 @@ class GateTest : AbstractSimulationTest() {
     }
 
     @Test
-    fun testXnorGate() {
+    fun testXNORGate() {
         val gate = XNORGate()
         simulateNSteps(10) {
             gate.a.power = true

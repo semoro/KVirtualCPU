@@ -26,6 +26,20 @@ class ANDGate {
     }
 }
 
+class MultiANDGate(val bits: Int) {
+    val transistors = Array(bits, { transistor(Transistor.SiliconType.N) })
+    val input = ArrayBasedBus(transistors.map { it.gate }.toTypedArray())
+    val output = transistors.last().drain
+
+    init {
+        var source = VCC
+        transistors.forEach {
+            it.source.link(source)
+            source = it.drain
+        }
+    }
+}
+
 
 class NANDGate {
     val andGate = ANDGate()
@@ -56,6 +70,34 @@ class ORGate {
         t2.source.link(Simulation.VCC)
         c.link(t1.drain)
         c.link(t2.drain)
+    }
+}
+
+class NORGate {
+    val not = NotGate()
+    val or = ORGate()
+
+    val a = or.a
+    val b = or.b
+
+    val c = not.b
+
+    init {
+        not.a.link(or.c)
+    }
+}
+
+
+class MultiOrGate(val bits: Int) {
+    val transistors = Array(bits, { transistor(Transistor.SiliconType.N) })
+    val input = ArrayBasedBus(transistors.map { it.gate }.toTypedArray())
+    val output = node()
+
+    init {
+        transistors.forEach {
+            it.source.link(VCC)
+            it.drain.link(output)
+        }
     }
 }
 
