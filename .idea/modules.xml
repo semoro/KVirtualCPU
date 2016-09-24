@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/KVirtualCPU.iml" filepath="$PROJECT_DIR$/.idea/modules/KVirtualCPU.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/gui/gui.iml" filepath="$PROJECT_DIR$/.idea/modules/gui/gui.iml" group="gui" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/gui/gui_main.iml" filepath="$PROJECT_DIR$/.idea/modules/gui/gui_main.iml" group="gui" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/gui/gui_test.iml" filepath="$PROJECT_DIR$/.idea/modules/gui/gui_test.iml" group="gui" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/simulation/simulation.iml" filepath="$PROJECT_DIR$/.idea/modules/simulation/simulation.iml" group="simulation" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/simulation/simulation_main.iml" filepath="$PROJECT_DIR$/.idea/modules/simulation/simulation_main.iml" group="simulation" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/simulation/simulation_test.iml" filepath="$PROJECT_DIR$/.idea/modules/simulation/simulation_test.iml" group="simulation" />
+    </modules>
+  </component>
+</project>

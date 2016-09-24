@@ -1,0 +1,41 @@
+version '0.0.0-SNAPSHOT'
+
+buildscript {
+    ext.kotlin_version = '1.0.3'
+
+    repositories {
+        jcenter()
+        maven { url "http://dl.bintray.com/robfletcher/gradle-plugins" }
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+
+allprojects {
+    apply plugin: 'eclipse'
+    apply plugin: 'idea'
+
+    version = rootProject.version
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        jcenter()
+    }
+}
+
+project(":simulation") {
+    apply plugin: 'kotlin'
+    dependencies {
+        compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+        compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    }
+}
+
+project(":gui") {
+    apply plugin: 'kotlin'
+    dependencies {
+        compile project(":simulation")
+    }
+}
