@@ -1,12 +1,13 @@
 package com.xcodersteam.cpue.simulation
 
 import com.xcodersteam.cpue.Simulation.allLinks
+import java.util.*
 
 /**
  * Created by semoro on 30.07.16.
  */
 open class Node {
-    val links = mutableListOf<Node>()
+    val links = LinkedList<Node>()
 
     var isPowered = false
 
@@ -18,7 +19,10 @@ open class Node {
     }
 
     open fun onPowerChange(from: Node?, state: Boolean) {
-        links.filterNot { it === from }.forEach { it.notifyStateChange(this, state) }
+        for (node in links) {
+            if (node != from)
+                node.notifyStateChange(this, state)
+        }
     }
 
 
