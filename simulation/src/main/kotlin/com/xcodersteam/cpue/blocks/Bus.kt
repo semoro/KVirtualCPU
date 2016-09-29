@@ -28,3 +28,6 @@ var AbstractBus.asBits: Int
     get() = nodes.map(Node::isPowered).map { if (it) 1 else 0 }.reduceIndexed { i, acc, v -> (v shl i) or acc }
     set(value) = generateSequence(value, { it shr 1 }).map { it and 1 == 1 }.take(this.bits).forEachIndexed { i, b -> nodes[i].power = b }
 
+var AbstractBus.asLongBits: Long
+    get() = nodes.map(Node::isPowered).map { if (it) 1L else 0L }.reduceIndexed { i, acc, v -> (v shl i) or acc }
+    set(value) = generateSequence(value, { it shr 1 }).map { it and 1L == 1L }.take(this.bits).forEachIndexed { i, b -> nodes[i].power = b }
