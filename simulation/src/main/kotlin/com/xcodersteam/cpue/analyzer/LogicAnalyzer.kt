@@ -3,19 +3,21 @@ package com.xcodersteam.cpue.analyzer
 import com.xcodersteam.cpue.blocks.AbstractBus
 import com.xcodersteam.cpue.simulation.Node
 import java.io.File
-import java.io.Writer
+import java.io.PrintWriter
 import java.util.*
 
 /**
  * Created by Dimach on 29.09.16.
  * ©XCodersTeam, 2016
  */
-class LogicAnalyzer(val file: File) {
+class LogicAnalyzer() {
     private val allVars = LinkedList<Var>()
     val modules = LinkedList<Module>()
     val changeDump = LinkedList<String>()
 
     fun update(tickNumber: Int) {
+        if (tickNumber > 0 && changeDump.last.startsWith("#"))
+            changeDump.removeLast()
         changeDump.add("#$tickNumber")
         if (tickNumber == 0) {
             allVars.forEach { it.firstTick(changeDump) }
@@ -24,16 +26,19 @@ class LogicAnalyzer(val file: File) {
         }
     }
 
-    fun save() {
-        val writer = file.writer()
-        writer.run {
-            write("\$date ${Date()} \$end")
-            write("\$version KVirtualCPU V0.0.0 \$end")
-            write("\$timescale 1 ns \$end")
-            write("\$enddefinitions \$end")
-            changeDump.forEach(writer::write)
-            flush()
-            close()
+    fun save(file: File) {
+        if (modules.isNotEmpty()) {
+            val writer = file.printWriter()
+            writer.run {
+                println("\$date ${Date()} \$end")
+                println("\$version KVirtualCPU V0.0.0 \$end")
+                println("\$timescale 1 ns \$end")
+                modules.forEach { it.writeVCDHeader(writer) }
+                println("\$enddefinitions \$end")
+                changeDump.forEach(writer::println)
+                flush()
+                close()
+            }
         }
     }
 
@@ -42,21 +47,25 @@ class LogicAnalyzer(val file: File) {
     }
 
     class Module(val name: String, init: Module.() -> Unit, val ana: LogicAnalyzer) {
-        init {
-            init()
-        }
+
 
         val n = LinkedList<Var>()
         val m = LinkedList<Module>()
 
-        fun link(node: Node, name: String) {
+        fun wire(node: Node, name: String) {
             val j = NodeVar(node, name, "_" + ana.allVars.size)
             n.add(j)
             ana.allVars.add(j)
         }
 
-        fun link(bus: AbstractBus, name: String) {
+        fun bus(bus: AbstractBus, name: String) {
             val j = BusVar(bus, name, "_" + ana.allVars.size)
+            n.add(j)
+            ana.allVars.add(j)
+        }
+
+        fun reg(bus: AbstractBus, name: String) {
+            val j = RegVar(bus, name, "_" + ana.allVars.size)
             n.add(j)
             ana.allVars.add(j)
         }
@@ -65,25 +74,29 @@ class LogicAnalyzer(val file: File) {
             m.add(Module(name, init, ana))
         }
 
-        fun writeVCDHeader(writer: Writer) {
+        fun writeVCDHeader(writer: PrintWriter) {
             writer.run {
-                write("\$scope module $name \$end")
+                println("\$scope module $name \$end")
                 m.forEach { it.writeVCDHeader(writer) }
                 n.forEach { it.writeVCDHeader(writer) }
-                write("\$upscope \$end")
+                println("\$upscope \$end")
             }
+        }
+
+        init {
+            init()
         }
     }
 
     abstract class Var(val name: String, val short: String) {
         abstract fun update(changeDump: LinkedList<String>)
         abstract fun firstTick(changeDump: LinkedList<String>)
-        abstract fun writeVCDHeader(writer: Writer)
+        abstract fun writeVCDHeader(writer: PrintWriter)
     }
 
     class NodeVar(val node: Node, name: String, short: String) : Var(name, short) {
-        override fun writeVCDHeader(writer: Writer) {
-            writer.write("\$var wire 1 $short $name \$end")
+        override fun writeVCDHeader(writer: PrintWriter) {
+            writer.println("\$var wire 1 $short $name \$end")
         }
 
         override fun firstTick(changeDump: LinkedList<String>) {
@@ -101,13 +114,23 @@ class LogicAnalyzer(val file: File) {
         }
     }
 
-    class BusVar(val bus: AbstractBus, name: String, short: String) : Var(name, short) {
-        override fun writeVCDHeader(writer: Writer) {
-            writer.write("\$var wire ${bus.bits} $short $name \$end")
+    class RegVar(bus: AbstractBus, name: String, short: String) : BusVar(bus, name, short) {
+        override fun writeVCDHeader(writer: PrintWriter) {
+            writer.println("\$var reg ${bus.bits} $short $name \$end")
+        }
+    }
+
+    open class BusVar(val bus: AbstractBus, name: String, short: String) : Var(name, short) {
+
+        val nodes = bus.nodes
+
+        open override fun writeVCDHeader(writer: PrintWriter) {
+            writer.println("\$var wire ${bus.bits} $short $name \$end")
         }
 
         override fun firstTick(changeDump: LinkedList<String>) {
-            bus.nodes.forEachIndexed { i, node -> prev[i] = node.isPowered }
+            nodes.forEachIndexed { i, node -> prev[i] = node.isPowered }
+            changeDump.add(prev.joinToString(separator = "", prefix = "b", postfix = " " + short) { if (it) "1" else "0" })
         }
 
         val prev = BooleanArray(bus.bits)
@@ -115,13 +138,13 @@ class LogicAnalyzer(val file: File) {
         override fun update(changeDump: LinkedList<String>) {
             var equals = true
             for (i in 0..prev.lastIndex) {
-                if (prev[i] != bus.nodes[i].isPowered) {
+                if (prev[i] != nodes[i].isPowered) {
                     equals = false
-                    prev[i] = bus.nodes[i].isPowered
+                    prev[i] = nodes[i].isPowered
                 }
             }
             if (!equals) {
-                changeDump.add(prev.joinToString(separator = "", prefix = "b", postfix = short) { if (it) "1" else "0" })
+                changeDump.add(prev.joinToString(separator = "", prefix = "b", postfix = " " + short) { if (it) "1" else "0" })
             }
         }
     }

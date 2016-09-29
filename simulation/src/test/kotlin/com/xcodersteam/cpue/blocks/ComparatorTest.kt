@@ -15,6 +15,11 @@ class ComparatorTest : AbstractSimulationTest() {
     @Test
     fun testPureEqualityComparator() {
         val cmp = EqualityComparator(8)
+        logicAnalyzer.module("cmp") {
+            bus(cmp.a, "a")
+            bus(cmp.b, "b")
+            wire(cmp.out, "out")
+        }
         for (i in 0..255) {
             for (j in 0..255) {
                 simulateNSteps(6) {

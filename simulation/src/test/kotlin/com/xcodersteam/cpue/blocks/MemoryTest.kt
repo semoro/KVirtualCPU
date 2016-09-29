@@ -31,6 +31,17 @@ class MemoryTest : AbstractSimulationTest() {
     @Test
     fun testMemory() {
         val memory = MemoryBlock(8, 8, 0, 256)
+        logicAnalyzer.module("memory") {
+            wire(memory.s, "s")
+            wire(memory.r, "r")
+            bus(memory.addressBus, "address")
+            bus(memory.dataBus, "data")
+            module("rows") {
+                memory.memoryRows.forEachIndexed { i, memoryRow ->
+                    reg(memoryRow.memoryLine.outBus, "row_$i")
+                }
+            }
+        }
         for (i in 0..255) {
             simulateNSteps(3) {
                 memory.addressBus.asBits = i

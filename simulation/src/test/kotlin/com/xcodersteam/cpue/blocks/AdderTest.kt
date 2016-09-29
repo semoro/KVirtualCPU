@@ -78,6 +78,12 @@ class AdderTest : AbstractSimulationTest() {
     @Test
     fun testSummer() {
         val summer = Summer(8)
+        logicAnalyzer.module("summer") {
+            bus(summer.x1, "a")
+            bus(summer.x2, "b")
+            bus(summer.s, "s")
+        }
+
         for (i in 0..128)
             for (j in 0..128) {
                 simulateNSteps(16) {
