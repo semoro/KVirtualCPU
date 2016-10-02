@@ -1,7 +1,8 @@
 package com.xcodersteam.cpue.kcpu1.dummy
 
-import com.xcodersteam.cpue.blocks.AbstractSimulationTest
+import com.xcodersteam.cpue.AbstractSimulationTest
 import com.xcodersteam.cpue.kcpu1.blocks.MainBusConnector
+import com.xcodersteam.cpue.kcpu1.blocks.ROMController
 import com.xcodersteam.cpue.kcpu1.mainBus
 import com.xcodersteam.cpue.kcpu1.reg
 import org.hamcrest.CoreMatchers.equalTo
@@ -18,21 +19,26 @@ class ROMTest : AbstractSimulationTest() {
         logicAnalyzer.module("romController") {
             reg(controller.addressRegisterL, "addressL")
             reg(controller.addressRegisterH, "addressH")
-            reg(controller.externalConnections[0], "ext0x3")
-            reg(controller.externalConnections[1], "ext0x4")
-            reg(controller.externalConnections[2], "ext0x5")
+            reg(controller.outputs[0], "ext0x3")
+            reg(controller.outputs[1], "ext0x4")
+            reg(controller.outputs[2], "ext0x5")
         }
     }
 
     @Test
     fun testL() {
-        val rom = DummyROM(12)
-        for (i in 0..11)
+        val rom = DummyROM(256 * 3)
+        for (i in 0..256 * 3 - 1)
             rom.data[i] = i.toByte()
-        val controller = ROMController(1, rom)
+        val chip = DummyROMChip(rom)
+
+        val controller = ROMController(1)
+        controller.extReadClk.link(chip.channel1.readClk)
+        controller.extAddress.link(chip.channel1.addressBus)
+        controller.extOutputs.forEachIndexed { i, bus -> chip.channel1.outputBuses[i].link(bus) }
         setupLogicAnalyzer(controller)
         (controller as MainBusConnector).run {
-            for (j in 0..3) {
+            for (j in 0..255) {
                 simulateNSteps(3) {
                     addressBus.asBits = 0x1
                     reset.power = true
@@ -51,7 +57,7 @@ class ROMTest : AbstractSimulationTest() {
                         addressBus.asBits = 0x3 + i
                         read.power = true
                     }
-                    collector.checkThat(dataBus.asBits, equalTo(rom.data[j * 3 + i].toInt()))
+                    collector.checkThat(dataBus.asBits, equalTo(rom.data[j * 3 + i].toInt() and 0xff))
                 }
             }
         }
@@ -59,13 +65,19 @@ class ROMTest : AbstractSimulationTest() {
 
     @Test
     fun testHL() {
-        val rom = DummyROM(1024 * 3)
-        for (i in 0..1024 * 3 - 1)
+
+        val rom = DummyROM(65536 * 3)
+        for (i in 0..65536 * 3 - 1)
             rom.data[i] = i.toByte()
-        val controller = ROMController(1, rom)
+        val chip = DummyROMChip(rom)
+
+        val controller = ROMController(1)
+        controller.extReadClk.link(chip.channel1.readClk)
+        controller.extAddress.link(chip.channel1.addressBus)
+        controller.extOutputs.forEachIndexed { i, bus -> chip.channel1.outputBuses[i].link(bus) }
         setupLogicAnalyzer(controller)
         (controller as MainBusConnector).run {
-            for (j in 0..1023) {
+            for (j in 0..65535) {
                 simulateNSteps(3) {
                     addressBus.asBits = 0x1
                     reset.power = true
@@ -93,7 +105,8 @@ class ROMTest : AbstractSimulationTest() {
                         addressBus.asBits = 0x3 + i
                         read.power = true
                     }
-                    collector.checkThat(dataBus.asBits.toByte(), equalTo(rom.data[j * 3 + i]))
+
+                    collector.checkThat(dataBus.asBits, equalTo(rom.data[j * 3 + i].toInt() and 0xff))
                 }
             }
         }

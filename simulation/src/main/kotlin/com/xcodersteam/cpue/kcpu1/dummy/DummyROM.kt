@@ -1,8 +1,9 @@
 package com.xcodersteam.cpue.kcpu1.dummy
 
 import com.xcodersteam.cpue.Simulation
-import com.xcodersteam.cpue.kcpu1.blocks.MainBusConnector
-import com.xcodersteam.cpue.kcpu1.blocks.Register
+import com.xcodersteam.cpue.Simulation.node
+import com.xcodersteam.cpue.blocks.NodesBus
+import com.xcodersteam.cpue.dummy.DummyControlledBus
 
 /**
  * Created by Semoro on 29.09.16.
@@ -14,39 +15,31 @@ class DummyROM(val size: Int) {
 }
 
 
-class ROMController(val address: Int, val rom: DummyROM) : MainBusConnector {
+class DummyROMChip(val rom: DummyROM) {
 
-
-    val addressRegisterL = Register(address)
-    val addressRegisterH = Register(address + 1)
-
-    val externalConnections = Array(3, { DummyOutputRegister(address + 2 + it) })
-
-
-    override val addressBus = addressRegisterL.addressBus
-    override val dataBus = addressRegisterL.dataBus
-    override val set = addressRegisterL.set
-    override val read = addressRegisterL.read
-    override val reset = addressRegisterL.reset
-
-
-    var shouldUpdate = false
-
-    init {
-        addressRegisterH.link(this)
-        externalConnections.forEach { it.link(this) }
-
-        Simulation.postUpdate.add({
-            if (!shouldUpdate && addressRegisterL.setControl.drain.isPowered || addressRegisterH.setControl.drain.isPowered) {
+    class Channel(val chip: DummyROMChip) {
+        val addressBus = NodesBus(16)
+        val readClk = node()
+        val outputBuses = Array(3, { DummyControlledBus(8) })
+        var shouldUpdate = false
+        fun update() {
+            if (!shouldUpdate && readClk.isPowered)
                 shouldUpdate = true
-            }
-            if (shouldUpdate && !set.isPowered) {
-                shouldUpdate = false
-                val address = addressRegisterL.memory.outBus.asBits or (addressRegisterH.memory.outBus.asBits shl 8)
+            if (shouldUpdate && !readClk.isPowered) {
+                val address = addressBus.asBits
                 for (i in 0..2) {
-                    externalConnections[i].dummyControlBus.stateBits = rom.data[address * 3 + i].toInt()
+                    outputBuses[i].stateBits = chip.rom.data[address * 3 + i].toInt()
                 }
             }
-        })
+        }
+    }
+
+    val channel1 = Channel(this)
+    val channel2 = Channel(this)
+
+    init {
+        Simulation.postUpdate.add(channel1::update)
+        Simulation.postUpdate.add(channel2::update)
     }
 }
+

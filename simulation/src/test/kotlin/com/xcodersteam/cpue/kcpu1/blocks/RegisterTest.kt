@@ -1,6 +1,6 @@
 package com.xcodersteam.cpue.kcpu1.blocks
 
-import com.xcodersteam.cpue.blocks.AbstractSimulationTest
+import com.xcodersteam.cpue.AbstractSimulationTest
 import junit.framework.TestCase.assertEquals
 import org.junit.Before
 import org.junit.Test

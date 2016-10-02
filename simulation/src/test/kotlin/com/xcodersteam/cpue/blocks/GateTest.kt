@@ -1,5 +1,6 @@
 package com.xcodersteam.cpue.blocks
 
+import com.xcodersteam.cpue.AbstractSimulationTest
 import com.xcodersteam.cpue.Simulation.power
 import junit.framework.Assert.*
 import org.junit.Test

@@ -1,5 +1,6 @@
 package com.xcodersteam.cpue.blocks
 
+import com.xcodersteam.cpue.AbstractSimulationTest
 import com.xcodersteam.cpue.Simulation.power
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue

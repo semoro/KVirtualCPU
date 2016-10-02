@@ -1,5 +1,6 @@
 package com.xcodersteam.cpue.blocks
 
+import com.xcodersteam.cpue.AbstractSimulationTest
 import org.hamcrest.CoreMatchers.equalTo
 import org.junit.Test
 

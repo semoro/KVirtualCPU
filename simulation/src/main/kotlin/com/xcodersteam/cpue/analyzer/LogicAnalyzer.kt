@@ -74,6 +74,13 @@ class LogicAnalyzer() {
             m.add(Module(name, init, ana))
         }
 
+        fun error(name: String): ErrorVar {
+            val v = ErrorVar(name, "_" + ana.allVars.size)
+            n.add(v)
+            ana.allVars.add(v)
+            return v
+        }
+
         fun writeVCDHeader(writer: PrintWriter) {
             writer.run {
                 println("\$scope module $name \$end")
@@ -117,6 +124,30 @@ class LogicAnalyzer() {
     class RegVar(bus: AbstractBus, name: String, short: String) : BusVar(bus, name, short) {
         override fun writeVCDHeader(writer: PrintWriter) {
             writer.println("\$var reg ${bus.bits} $short $name \$end")
+        }
+    }
+
+    class ErrorVar(name: String, short: String) : Var(name, short) {
+        var errorOnTick = false
+        var errorOnPrevTick = false
+        override fun update(changeDump: LinkedList<String>) {
+            if (errorOnPrevTick) {
+                changeDump.add("0$short")
+                errorOnPrevTick = false
+            }
+            if (errorOnTick) {
+                changeDump.add("1$short")
+                errorOnTick = false
+                errorOnPrevTick = true
+            }
+        }
+
+        override fun firstTick(changeDump: LinkedList<String>) {
+            changeDump.add("0$short")
+        }
+
+        override fun writeVCDHeader(writer: PrintWriter) {
+            writer.println("\$var wire 1 $short $name \$end")
         }
     }
 

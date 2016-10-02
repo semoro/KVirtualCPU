@@ -1,10 +1,8 @@
-package com.xcodersteam.cpue.blocks
+package com.xcodersteam.cpue
 
-import com.xcodersteam.cpue.Simulation
 import com.xcodersteam.cpue.analyzer.LogicAnalyzer
 import org.junit.Before
 import org.junit.Rule
-import org.junit.rules.ErrorCollector
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 import java.io.File
@@ -17,7 +15,7 @@ abstract class AbstractSimulationTest {
 
     @Rule
     @JvmField
-    var collector = ErrorCollector()
+    var collector = SpecialErrorCollector()
 
     var tick = 0
     open var writeVCD: Boolean = false

@@ -20,6 +20,12 @@ abstract class AbstractBus(val bits: Int) {
         nodes.forEachIndexed { i, node -> other.nodes[i].link(node) }
     }
 
+    fun link(other: AbstractBus, offset: Int) {
+        if ((bits + offset) > other.bits)
+            throw InvalidArgumentException(arrayOf("connector out of bounds"))
+        nodes.forEachIndexed { i, node -> other.nodes[i + offset].link(node) }
+    }
+
     var asBits: Int
         get() = nodes.map(Node::isPowered).map { if (it) 1 else 0 }.reduceIndexed { i, acc, v -> (v shl i) or acc }
         set(value) = generateSequence(value, { it shr 1 }).map { it and 1 == 1 }.take(this.bits).forEachIndexed { i, b -> nodes[i].power = b }
