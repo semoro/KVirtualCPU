@@ -47,6 +47,11 @@ abstract class AbstractSimulationTest {
             super.finished(description)
             writeVCD = VCD
             writeVCDonFail = VCDonFail
+            println("Statistics:")
+            println("\ttransistors:${Simulation.allTransistors.size}")
+            println("\tnodes:${Simulation.allNodes.size}")
+            println("\tlinks:${Simulation.allLinks.size}")
+            println("\tticks:$tick")
         }
 
         override fun succeeded(description: Description) {

@@ -1,6 +1,8 @@
 package com.xcodersteam.cpue.kcpu1.blocks
 
+import com.xcodersteam.cpue.Simulation.node
 import com.xcodersteam.cpue.blocks.AbstractBus
+import com.xcodersteam.cpue.blocks.NodesBus
 import com.xcodersteam.cpue.simulation.Node
 
 /**
@@ -22,4 +24,12 @@ interface MainBusConnector {
         other.read.link(this.read)
         other.reset.link(this.reset)
     }
+}
+
+class MainBusConnectorImpl : MainBusConnector {
+    override val addressBus: AbstractBus = NodesBus(8)
+    override val dataBus: AbstractBus = NodesBus(8)
+    override val set: Node = node()
+    override val read: Node = node()
+    override val reset: Node = node()
 }
