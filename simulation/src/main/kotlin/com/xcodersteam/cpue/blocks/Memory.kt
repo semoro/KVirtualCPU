@@ -44,21 +44,6 @@ class AddressMatcher(val bits: Int, val address: Int) {
     }
 }
 
-class BusCommutator(bits: Int) {
-
-    val transistors = Array(bits, { i ->
-        transistor(SiliconType.N)
-    })
-
-    val enable = node()
-    val busA = ArrayBasedBus(transistors.map { it.source }.toTypedArray())
-    val busB = ArrayBasedBus(transistors.map { it.drain }.toTypedArray())
-
-    init {
-        transistors.forEach { it.gate.link(enable) }
-    }
-}
-
 class MemoryBlock(val addressBits: Int, val dataBits: Int, startAddress: Int, size: Int) {
 
     val s = node()

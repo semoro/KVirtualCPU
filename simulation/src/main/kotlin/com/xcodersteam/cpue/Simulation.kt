@@ -1,5 +1,7 @@
 package com.xcodersteam.cpue
 
+
+import com.xcodersteam.cpue.Simulation.UpdateListener
 import com.xcodersteam.cpue.simulation.Link
 import com.xcodersteam.cpue.simulation.Node
 import com.xcodersteam.cpue.simulation.Transistor
@@ -10,9 +12,13 @@ import com.xcodersteam.cpue.simulation.Transistor
  */
 object Simulation {
 
+    typealias UpdateListener = () -> Unit
+
     val allNodes = mutableListOf<Node>()
     val allTransistors = mutableListOf<Transistor>()
     val allLinks = mutableSetOf<Link>()
+    val preUpdate = mutableListOf<UpdateListener>()
+    val postUpdate = mutableListOf<UpdateListener>()
 
 
     fun node(): Node {
@@ -41,6 +47,14 @@ object Simulation {
         allTransistors.forEach { it.update() }
     }
 
+    fun postUpdate() {
+        postUpdate.forEach { it.invoke() }
+    }
+
+    fun preUpdate() {
+        preUpdate.forEach { it.invoke() }
+    }
+
     val VCC = node()
 
     fun clear() {
@@ -58,7 +72,9 @@ object Simulation {
         Simulation.reset()
         VCC.notifyStateChange(null, true)
         e.invoke(this)
+        Simulation.preUpdate()
         Simulation.updateTransistors()
+        Simulation.postUpdate()
     }
 
 

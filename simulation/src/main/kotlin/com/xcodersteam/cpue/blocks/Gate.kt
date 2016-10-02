@@ -4,7 +4,7 @@ import com.xcodersteam.cpue.Simulation
 import com.xcodersteam.cpue.Simulation.VCC
 import com.xcodersteam.cpue.Simulation.node
 import com.xcodersteam.cpue.Simulation.transistor
-import com.xcodersteam.cpue.simulation.Transistor
+import com.xcodersteam.cpue.simulation.Transistor.SiliconType
 
 /**
  * Created by Semoro on 23.09.16.
@@ -12,8 +12,8 @@ import com.xcodersteam.cpue.simulation.Transistor
  */
 
 class ANDGate {
-    val t1 = transistor(Transistor.SiliconType.N)
-    val t2 = transistor(Transistor.SiliconType.N)
+    val t1 = transistor(SiliconType.N)
+    val t2 = transistor(SiliconType.N)
 
     val a = t1.gate
     val b = t2.gate
@@ -27,7 +27,7 @@ class ANDGate {
 }
 
 class MultiANDGate(val bits: Int) {
-    val transistors = Array(bits, { transistor(Transistor.SiliconType.N) })
+    val transistors = Array(bits, { transistor(SiliconType.N) })
     val input = ArrayBasedBus(transistors.map { it.gate }.toTypedArray())
     val output = transistors.last().drain
 
@@ -56,8 +56,8 @@ class NANDGate {
 }
 
 class ORGate {
-    val t1 = transistor(Transistor.SiliconType.N)
-    val t2 = transistor(Transistor.SiliconType.N)
+    val t1 = transistor(SiliconType.N)
+    val t2 = transistor(SiliconType.N)
 
     val a = t1.gate
     val b = t2.gate
@@ -89,7 +89,7 @@ class NORGate {
 
 
 class MultiOrGate(val bits: Int) {
-    val transistors = Array(bits, { transistor(Transistor.SiliconType.N) })
+    val transistors = Array(bits, { transistor(SiliconType.N) })
     val input = ArrayBasedBus(transistors.map { it.gate }.toTypedArray())
     val output = node()
 
@@ -102,7 +102,7 @@ class MultiOrGate(val bits: Int) {
 }
 
 class NotGate {
-    val t1 = transistor(Transistor.SiliconType.P)
+    val t1 = transistor(SiliconType.P)
 
     val a = t1.gate
     val b = t1.drain
@@ -151,8 +151,8 @@ class XNORGate {
 }
 
 class RSLatch {
-    val resetControl = transistor(Transistor.SiliconType.P)
-    val dataT = transistor(Transistor.SiliconType.N)
+    val resetControl = transistor(SiliconType.P)
+    val dataT = transistor(SiliconType.N)
 
     val q = dataT.drain
     val s = dataT.gate
@@ -162,5 +162,15 @@ class RSLatch {
         dataT.source.link(VCC)
         resetControl.source.link(dataT.drain)
         dataT.gate.link(resetControl.drain)
+    }
+}
+
+class TDiode {
+    val transistor = transistor(SiliconType.N)
+    val a = transistor.gate
+    val b = transistor.drain
+
+    init {
+        a.link(transistor.source)
     }
 }

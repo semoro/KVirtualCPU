@@ -1,4 +1,6 @@
-package com.xcodersteam.cpue.blocks
+package com.xcodersteam.cpue.kcpu1.dummy
+
+import com.xcodersteam.cpue.blocks.NodesBus
 
 /**
  * Created by Semoro on 24.09.16.
@@ -8,5 +10,4 @@ package com.xcodersteam.cpue.blocks
 class DummyRAM(addressBits: Int, dataBits: Int) {
     val addressBus = NodesBus(addressBits)
     val dataBus = NodesBus(dataBits)
-
 }
