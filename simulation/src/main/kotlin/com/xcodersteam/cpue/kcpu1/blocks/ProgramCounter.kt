@@ -2,10 +2,7 @@ package com.xcodersteam.cpue.kcpu1.blocks
 
 import com.xcodersteam.cpue.Simulation.VCC
 import com.xcodersteam.cpue.Simulation.node
-import com.xcodersteam.cpue.blocks.BusCommutator
-import com.xcodersteam.cpue.blocks.MemoryLine
-import com.xcodersteam.cpue.blocks.NotGate
-import com.xcodersteam.cpue.blocks.Summer
+import com.xcodersteam.cpue.blocks.*
 
 /**
  * Created by Semoro on 02.10.16.
@@ -18,10 +15,15 @@ open class LinearCounter {
     val acc = MemoryLine(16)
     val accToDataCommutator = BusCommutator(16)
 
-    val phase0 = node()
+    val phase0 = node() //TODO Turn into array
     val phase1 = node()
     val phase2 = node()
     val phase3 = node()
+
+    open val phases = arrayOf(phase0, phase1, phase2, phase3)
+
+    val incDisableFlag = node()
+
 
     init {
         summer.x1.link(data.outBus)
@@ -45,7 +47,7 @@ open class LinearCounter {
 
         accToDataCommutator.busA.link(acc.outBus)
         accToDataCommutator.busB.link(data.inBus)
-        accToDataCommutator.enable.link(phase3)
+        accToDataCommutator.enable.link(phase3 and not(incDisableFlag))
     }
 }
 
@@ -58,6 +60,7 @@ class ProgramCounter() : LinearCounter() {
 
     val not = NotGate()
     val phase4 = node()
+    override val phases = arrayOf(*super.phases, phase4)
 
     val mainBusConnector: MainBusConnector = MainBusConnectorImpl()
 
