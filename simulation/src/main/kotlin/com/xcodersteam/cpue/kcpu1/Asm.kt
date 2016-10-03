@@ -8,6 +8,9 @@ package com.xcodersteam.cpue.kcpu1
 
 class AsmContext() {
 
+    val labels = mutableMapOf<String, Int>()
+    val jumpsToSatisfy = mutableMapOf<String, MutableList<Int>>()
+
     val outList = mutableListOf<Byte>()
 
     fun toByteArray(): ByteArray {
@@ -15,6 +18,9 @@ class AsmContext() {
     }
 
     fun writeInto(byteArray: ByteArray, offset: Int = 0) {
+        println("ASM Statistics:")
+        println("\tInstructions: ${outList.size / 3}")
+        println("\t${outList.size} bytes used of ${byteArray.size}")
         val thisAsArray = toByteArray()
         for (i in 0..thisAsArray.size - 1)
             byteArray[i + offset] = thisAsArray[i]
@@ -37,8 +43,25 @@ class AsmContext() {
         mov(rcv.H, (data and 0xff00) shr 8)
     }
 
+    fun jmp(target: String) {
+        labels[target]?.let { jmp(it) } ?: run {
+            jumpsToSatisfy.getOrPut(target, { mutableListOf() }) += outList.size
+            nop()
+            nop()
+        }
+    }
+
     fun jmp(target: Int) {
         mov(JUMP, target)
+    }
+
+    private fun jmp(target: Int, insertTargets: List<Int>) {
+        val context = AsmContext()
+        context.jmp(target)
+        val gen = context.toByteArray()
+        insertTargets.forEach { i ->
+            gen.forEachIndexed { j, byte -> outList[i + j] = byte }
+        }
     }
 
     fun nop() {
@@ -64,8 +87,12 @@ class AsmContext() {
         mov(ALU_B, b)
     }
 
-    fun label(): Int {
-        return outList.size / 3
+    fun label(name: String) {
+        labels[name] = outList.size / 3
+        jumpsToSatisfy[name]?.let {
+            jmp(labels[name]!!, it)
+            jumpsToSatisfy.remove(name)
+        }
     }
 }
 

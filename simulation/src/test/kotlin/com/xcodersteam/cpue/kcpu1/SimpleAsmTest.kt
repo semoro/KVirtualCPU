@@ -12,23 +12,47 @@ class SimpleAsmTest : AbstractAsmTest() {
 
     @Test
     fun testJump() {
+        writeVCD = true
+
+        logicAnalyzer.module("jumpRegister") {
+            reg(kcpu.jumpRegister.checkRegister, "checkRegister")
+            wire(kcpu.jumpRegister.shouldCheckFlag.q, "SCF")
+            wire(kcpu.jumpRegister.shouldJumpFlag.q, "SJF")
+            wire(kcpu.programCounter.incDisableFlag, "IDF")
+            wire(kcpu.jumpRegister.checkResult.output, "checkResult")
+        }
+
         asm {
-            val start = label()
-            jmp(start)
+            label("start")
+
+            mov(JUMP_A, 0)
+            jmp("exit")
+
+            mov(JUMP_A, 1)
+            jmp("start")
+
+            label("exit")
         }.writeInto(rom.data)
+
+
+        for (i in 0..21 / 3) {
+            for (j in 0..2)
+                print(Integer.toHexString(rom.data[i * 3 + j].toInt()) + " ")
+            println()
+        }
         simulateCycles(10)
-        assertEquals(0x0, kcpu.programCounter.data.outBus.asBits)
+        assert(0xA > kcpu.programCounter.data.outBus.asBits)
     }
 
     @Test
     fun testALU() {
         asm {
-            val start = label()
+            label("start")
             inalu(15, 10)
             nop()
             nop()
             nop()
-            jmp(start)
+            jmp("start")
         }.writeInto(rom.data)
         simulateCycles(5)
         assertEquals(25, kcpu.alu.sum.internalValueBus.asBits)

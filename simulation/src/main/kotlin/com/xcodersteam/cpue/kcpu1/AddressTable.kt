@@ -21,6 +21,7 @@ val ROM_PC_C = Address(0x3)
 
 val JUMP_L = Address(0x4)
 val JUMP_H = Address(0x5)
+val JUMP_A = Address(0xF)
 val JUMP = AddressLH(JUMP_L, JUMP_H)
 
 val ALU_A = Address(0x6)
