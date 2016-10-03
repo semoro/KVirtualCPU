@@ -66,11 +66,12 @@ object Simulation {
 
     var Node.power: Boolean
         get() = this.isPowered
-        set(value) = this.notifyStateChange(null, value)
+        set(value) = this.notifyStateChange(null)
 
     fun simulationStep(e: Simulation.() -> Unit) {
         Simulation.reset()
-        VCC.notifyStateChange(null, true)
+        //VCC.links.parallelStream().forEach { it.notifyStateChange(VCC) }
+        VCC.notifyStateChange(null)
         e.invoke(this)
         Simulation.preUpdate()
         Simulation.updateTransistors()

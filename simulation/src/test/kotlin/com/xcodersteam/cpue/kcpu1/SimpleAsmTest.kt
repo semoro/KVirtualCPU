@@ -12,8 +12,6 @@ class SimpleAsmTest : AbstractAsmTest() {
 
     @Test
     fun testJump() {
-        writeVCD = true
-
         logicAnalyzer.module("jumpRegister") {
             reg(kcpu.jumpRegister.checkRegister, "checkRegister")
             wire(kcpu.jumpRegister.shouldCheckFlag.q, "SCF")
@@ -34,12 +32,6 @@ class SimpleAsmTest : AbstractAsmTest() {
             label("exit")
         }.writeInto(rom.data)
 
-
-        for (i in 0..21 / 3) {
-            for (j in 0..2)
-                print(Integer.toHexString(rom.data[i * 3 + j].toInt()) + " ")
-            println()
-        }
         simulateCycles(10)
         assert(0xA > kcpu.programCounter.data.outBus.asBits)
     }

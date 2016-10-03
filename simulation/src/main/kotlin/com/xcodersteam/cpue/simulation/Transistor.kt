@@ -18,20 +18,20 @@ class Transistor(val channelType: SiliconType) {
     val gate: Node = TransistorNode(this)
 
     val source: Node = object : TransistorNode(this) {
-        override fun onPowerChange(from: Node?, state: Boolean) {
+        override fun onPowerChange(from: Node?) {
             if (channelOpen) {
-                drain.notifyStateChange(this, state)
+                drain.notifyStateChange(this)
             }
-            super.onPowerChange(from, state)
+            super.onPowerChange(from)
         }
     }
 
     val drain: Node = object : TransistorNode(this) {
-        override fun onPowerChange(from: Node?, state: Boolean) {
+        override fun onPowerChange(from: Node?) {
             if (channelOpen) {
-                source.notifyStateChange(this, state)
+                source.notifyStateChange(this)
             }
-            super.onPowerChange(from, state)
+            super.onPowerChange(from)
         }
     }
 

@@ -16,20 +16,20 @@ class DummyControlTrigger {
     }
 
     val source: Node = object : DCTNode() {
-        override fun onPowerChange(from: Node?, state: Boolean) {
+        override fun onPowerChange(from: Node?) {
             if (triggerState) {
-                drain.notifyStateChange(this, state)
+                drain.notifyStateChange(this)
             }
-            super.onPowerChange(from, state)
+            super.onPowerChange(from)
         }
     }
 
     val drain: Node = object : DCTNode() {
-        override fun onPowerChange(from: Node?, state: Boolean) {
+        override fun onPowerChange(from: Node?) {
             if (triggerState) {
-                source.notifyStateChange(this, state)
+                source.notifyStateChange(this)
             }
-            super.onPowerChange(from, state)
+            super.onPowerChange(from)
         }
     }
 
