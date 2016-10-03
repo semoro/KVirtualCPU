@@ -2,6 +2,7 @@ package com.xcodersteam.cpue.kcpu1.blocks
 
 import com.xcodersteam.cpue.Simulation.node
 import com.xcodersteam.cpue.blocks.*
+import com.xcodersteam.cpue.kcpu1.ALU_GROUP
 import com.xcodersteam.cpue.simulation.Node
 
 /**
@@ -46,9 +47,12 @@ class KCPU {
 
     val jumpRegister = JumpRegister(programCounter)
 
+    val alu = ALU(ALU_GROUP)
+
     init {
         programCounter.mainBusConnector.link(mainBus)
         jumpRegister.mainBusConnector.link(mainBus)
+        alu.mainBusConnector.link(mainBus)
 
         /*
         note:

@@ -1,10 +1,10 @@
-package com.xcodersteam.cpue.kcpu1.blocks
+package com.xcodersteam.cpue.kcpu1
 
 import com.xcodersteam.cpue.AbstractSimulationTest
 import com.xcodersteam.cpue.blocks.ArrayBasedBus
+import com.xcodersteam.cpue.kcpu1.blocks.KCPU
 import com.xcodersteam.cpue.kcpu1.dummy.DummyROM
 import com.xcodersteam.cpue.kcpu1.dummy.DummyROMChip
-import com.xcodersteam.cpue.kcpu1.mainBus
 import junit.framework.TestCase.assertEquals
 import org.junit.Test
 
@@ -18,13 +18,9 @@ class KCPUTest : AbstractSimulationTest() {
     fun simpleTest() {
         writeVCD = true
         val rom = DummyROM(65536 * 3)
-        rom.data[0] = 0x3
-        rom.data[1] = 0x4
-        rom.data[2] = 0x0
-
-        rom.data[3] = 0x3
-        rom.data[4] = 0x5
-        rom.data[5] = 0x0
+        asm {
+            jmp(0x0)
+        }.writeInto(rom.data)
 
 
         val chip = DummyROMChip(rom)
