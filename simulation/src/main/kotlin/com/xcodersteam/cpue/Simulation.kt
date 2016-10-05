@@ -66,7 +66,7 @@ object Simulation {
 
     var Node.power: Boolean
         get() = this.isPowered
-        set(value) = this.notifyStateChange(null)
+        set(value) = if (value) this.notifyStateChange(null) else Unit
 
     fun simulationStep(e: Simulation.() -> Unit) {
         Simulation.reset()
