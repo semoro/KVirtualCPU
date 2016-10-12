@@ -2,7 +2,8 @@ package com.xcodersteam.cpue.blocks
 
 import com.xcodersteam.cpue.AbstractSimulationTest
 import com.xcodersteam.cpue.Simulation.power
-import junit.framework.Assert.*
+import junit.framework.Assert.assertFalse
+import junit.framework.Assert.assertTrue
 import org.junit.Test
 
 /**
@@ -15,126 +16,155 @@ class GateTest : AbstractSimulationTest() {
     @Test
     fun testNotGate() {
         val gate = NotGate()
-        simulateNSteps(10) {
-            gate.a.power = true
-        }
-        assertFalse(gate.b.power)
-        simulateNSteps(10) {
-            gate.a.power = false
-        }
-        assertTrue(gate.b.power)
+        truthTable(1, 1,
+                0b0 to 0b1,
+                0b1 to 0b0
+        ).setup {
+            gate.a.link(inputs.nodes[0])
+            gate.b.link(outputs.nodes[0])
+        }.test(this, 3)
     }
 
     @Test
     fun testNORGate() {
         val gate = NORGate()
-        val t = truthTable(
-                arrayOf(0, 0) to arrayOf(1),
-                arrayOf(0, 1) to arrayOf(0),
-                arrayOf(1, 0) to arrayOf(0),
-                arrayOf(1, 1) to arrayOf(0)
-        )
-        t.test {
-            simulateNSteps(3) {
-                gate.a.power = inputs[0]
-                gate.b.power = inputs[1]
-            }
-            assertEquals(outputs[0], gate.c.power)
-        }
+        truthTable(2, 1,
+                0b00 to 0b1,
+                0b01 to 0b0,
+                0b10 to 0b0,
+                0b11 to 0b0
+        ).setup {
+            gate.a.link(inputs.nodes[0])
+            gate.b.link(inputs.nodes[1])
+            gate.c.link(outputs.nodes[0])
+        }.test(this, 10)
     }
 
     @Test
     fun testANDGate() {
         val gate = ANDGate()
-        simulateNSteps(10) {
-            gate.a.power = true
-        }
-        assertFalse(gate.c.power)
-        simulateNSteps(10) {
-            gate.a.power = true
-            gate.b.power = true
-        }
-        assertTrue(gate.c.power)
-        simulateNSteps(10) {
-            gate.b.power = true
-        }
-        assertFalse(gate.c.power)
+        truthTable(2, 1,
+                0b00 to 0b0,
+                0b01 to 0b0,
+                0b10 to 0b0,
+                0b11 to 0b1
+        ).setup {
+            gate.a.link(inputs.nodes[0])
+            gate.b.link(inputs.nodes[1])
+            gate.c.link(outputs.nodes[0])
+        }.test(this, 10)
+    }
+
+    @Test
+    fun testMultiANDGate() {
+        val gate = MultiANDGate(3)
+        truthTable(3, 1,
+                0b000 to 0b0,
+                0b001 to 0b0,
+                0b010 to 0b0,
+                0b011 to 0b0,
+                0b100 to 0b0,
+                0b101 to 0b0,
+                0b110 to 0b0,
+                0b111 to 0b1
+        ).setup {
+            gate.input.link(inputs)
+            gate.output.link(outputs.nodes[0])
+        }.test(this, 10)
+    }
+
+    @Test
+    fun testMultiORGate() {
+        val gate = MultiORGate(3)
+        truthTable(3, 1,
+                0b000 to 0b0,
+                0b001 to 0b1,
+                0b010 to 0b1,
+                0b011 to 0b1,
+                0b100 to 0b1,
+                0b101 to 0b1,
+                0b110 to 0b1,
+                0b111 to 0b1
+        ).setup {
+            gate.input.link(inputs)
+            gate.output.link(outputs.nodes[0])
+        }.test(this, 10)
     }
 
     @Test
     fun testORGate() {
         val gate = ORGate()
-        simulateNSteps(10) {
-            gate.a.power = true
+        truthTable(2, 1,
+                0b00 to 0b0,
+                0b01 to 0b1,
+                0b10 to 0b1,
+                0b11 to 0b1
+        ).setup {
+            gate.a.link(inputs.nodes[0])
+            gate.b.link(inputs.nodes[1])
+            gate.c.link(outputs.nodes[0])
+        }.test(this, 10)
+    }
+
+    @Test
+    fun testDiode() {
+        val diode = TDiode()
+        simulateNSteps(5) {
+            diode.a.power = true
         }
-        assertTrue(gate.c.power)
+        assertTrue(diode.b.power)
+
         simulateNSteps(10) {
-            gate.a.power = true
-            gate.b.power = true
+            diode.b.power = true
         }
-        assertTrue(gate.c.power)
-        simulateNSteps(10) {
-            gate.b.power = true
-        }
-        assertTrue(gate.c.power)
-        simulateNSteps(10) {}
-        assertFalse(gate.c.power)
+        assertFalse(diode.a.power)
+
     }
 
     @Test
     fun testXORGate() {
         val gate = XORGate()
-        simulateNSteps(10) {
-            gate.a.power = true
-        }
-        assertTrue(gate.c.power)
-        simulateNSteps(10) {
-            gate.a.power = true
-            gate.b.power = true
-        }
-        assertFalse(gate.c.power)
-        simulateNSteps(10) {
-            gate.b.power = true
-        }
-        assertTrue(gate.c.power)
-        simulateNSteps(10) {}
-        assertFalse(gate.c.power)
+        truthTable(2, 1,
+                0b00 to 0b0,
+                0b01 to 0b1,
+                0b10 to 0b1,
+                0b11 to 0b0
+        ).setup {
+            gate.a.link(inputs.nodes[0])
+            gate.b.link(inputs.nodes[1])
+            gate.c.link(outputs.nodes[0])
+        }.test(this, 10)
     }
 
     @Test
     fun testXNORGate() {
         val gate = XNORGate()
-        simulateNSteps(10) {
-            gate.a.power = true
-        }
-        assertFalse(gate.c.power)
-        simulateNSteps(10) {
-            gate.a.power = true
-            gate.b.power = true
-        }
-        assertTrue(gate.c.power)
-        simulateNSteps(10) {
-            gate.b.power = true
-        }
-        assertFalse(gate.c.power)
-        simulateNSteps(10) {}
-        assertTrue(gate.c.power)
+        truthTable(2, 1,
+                0b00 to 0b1,
+                0b01 to 0b0,
+                0b10 to 0b0,
+                0b11 to 0b1
+        ).setup {
+            gate.a.link(inputs.nodes[0])
+            gate.b.link(inputs.nodes[1])
+            gate.c.link(outputs.nodes[0])
+        }.test(this, 10)
     }
 
     @Test
     fun testRSLatch() {
         val gate = RSLatch()
-        simulateNSteps(10) {}
-        assertFalse(gate.q.power)
-        simulateNSteps(10) {
-            gate.s.power = true
-        }
-        assertTrue(gate.q.power)
-        simulateNSteps(10) {}
-        assertTrue(gate.q.power)
-        simulateNSteps(10) {
-            gate.r.power = true
-        }
-        assertFalse(gate.q.power)
+        truthTable(2, 1,
+                0b00 to 0b0,
+                0b00 to 0b0,
+                0b10 to 0b1,
+                0b00 to 0b1,
+                0b01 to 0b0,
+                0b00 to 0b0
+        ).setup {
+            gate.s.link(inputs.nodes[0])
+            gate.r.link(inputs.nodes[1])
+            gate.q.link(outputs.nodes[0])
+        }.test(this, 10)
     }
 }

@@ -27,7 +27,7 @@ class JumpRegister(val programCounter: ProgramCounter) {
     val mainBusConnector = MainBusConnectorImpl()
     val busCommutator = BusCommutator(16)
 
-    val checkResult = MultiOrGate(8)
+    val checkResult = MultiORGate(8)
 
     init {
         registerHigh.link(mainBusConnector)

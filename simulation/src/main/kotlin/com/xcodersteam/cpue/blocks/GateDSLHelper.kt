@@ -36,9 +36,45 @@ infix fun Node.and(other: Node): Node {
     return andGate.c
 }
 
+infix fun Node.nand(other: Node): Node {
+    val nandGate = NANDGate()
+    nandGate.a.link(this)
+    nandGate.b.link(other)
+    return nandGate.c
+}
+
 infix fun Node.uand(other: Node): Node {
     val t = Simulation.transistor(Transistor.SiliconType.N)
     t.source.link(this)
     t.gate.link(other)
     return t.drain
+}
+
+infix fun Node.uxnand(other: Node): Node {
+    val t = Simulation.transistor(Transistor.SiliconType.P)
+    t.source.link(this)
+    t.gate.link(other)
+    return t.drain
+}
+
+
+infix fun Node.ruand(other: Node): Node {
+    val t = Simulation.transistor(Transistor.SiliconType.N)
+    t.source.link(other)
+    t.gate.link(this)
+    return t.drain
+}
+
+infix fun Node.xor(other: Node): Node {
+    val gate = XORGate()
+    gate.a.link(this)
+    gate.b.link(other)
+    return gate.c
+}
+
+infix fun Node.xnor(other: Node): Node {
+    val gate = XNORGate()
+    gate.a.link(this)
+    gate.b.link(other)
+    return gate.c
 }

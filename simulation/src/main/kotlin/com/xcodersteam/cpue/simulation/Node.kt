@@ -6,7 +6,7 @@ import java.util.*
 open class Node {
     var links = LinkedList<Node>()
 
-    var isPowered = false
+    open var isPowered = false
 
 
     open fun notifyStateChange(from: Node?) {
@@ -27,10 +27,14 @@ open class Node {
         isPowered = false
     }
 
-    fun link(n2: Node) {
-        Simulation.allLinks.add(Link(this, n2))
-        this.links.add(n2)
-        n2.links.add(this)
+    open fun link(n2: Node) {
+        if (n2 is RefNode)
+            n2.link(this)
+        else {
+            Simulation.allLinks.add(Link(this, n2))
+            this.links.add(n2)
+            n2.links.add(this)
+        }
     }
 
 }

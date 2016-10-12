@@ -1,50 +1,54 @@
 package com.xcodersteam.cpue.blocks
 
+import com.xcodersteam.cpue.Simulation.refNode
+
 /**
  * Created by Semoro on 24.09.16.
  * ©XCodersTeam, 2016
  */
 
 class HalfAdder() { //Stable run at 4 ticks switch duty cycle
-    val xor = XORGate()
-    val and = ANDGate()
 
-    val x1 = xor.a
-    val x2 = xor.b
+    val a = refNode()
+    val b = refNode()
 
-    val s = xor.c
-    val c = and.c
+    val s = refNode()
+    val c = refNode()
 
     init {
-        xor.a.link(and.a)
-        xor.b.link(and.b)
+        s.link(a xor b)
+        c.link(a and b)
     }
 }
 
 class FullAdder() { //Stable run at 7 ticks switch duty cycle
-    val adder1 = HalfAdder()
-    val adder2 = HalfAdder()
-    val or = ORGate()
+    private val adder1 = HalfAdder()
+    private val adder2 = HalfAdder()
 
-    val x1 = adder1.x1
-    val x2 = adder1.x2
-    val cIn = adder2.x2
+    val a = refNode()
+    val b = refNode()
+    val cIn = refNode()
 
-    val s = adder2.s
-    val cOut = or.c
+    val s = refNode()
+    val cOut = refNode()
 
     init {
-        adder2.x1.link(adder1.s)
-        or.a.link(adder1.c)
-        or.b.link(adder2.c)
+        a.link(adder1.a)
+        b.link(adder1.b)
+
+        adder2.a.link(adder1.s)
+        cIn.link(adder2.b)
+
+        s.link(adder2.s)
+        cOut.link(adder1.c or adder2.c)
     }
 }
 
 class Summer(val bits: Int) { //Stable run at bits*2 ticks
     val firstAdder = HalfAdder()
     val adders = Array(bits - 1, { FullAdder() })
-    val x1 = ArrayBasedBus(arrayOf(firstAdder.x1, *adders.map { it.x1 }.toTypedArray()))
-    val x2 = ArrayBasedBus(arrayOf(firstAdder.x2, *adders.map { it.x2 }.toTypedArray()))
+    val x1 = ArrayBasedBus(arrayOf(firstAdder.a, *adders.map { it.a }.toTypedArray()))
+    val x2 = ArrayBasedBus(arrayOf(firstAdder.b, *adders.map { it.b }.toTypedArray()))
     val s = ArrayBasedBus(arrayOf(firstAdder.s, *adders.map { it.s }.toTypedArray()))
 
     init {

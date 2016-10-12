@@ -28,12 +28,12 @@ class SpecialErrorCollector() : Verifier() {
     }
 
     fun <T> checkSucceeds(callable: () -> T): T? {
-        try {
+        // try {
             return callable.invoke()
-        } catch (var3: Throwable) {
-            this.addError(var3)
-            return null
-        }
+        // } catch (var3: Throwable) {
+        //this.addError(var3)
+        // return null
+        // }
     }
 
 }

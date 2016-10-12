@@ -4,6 +4,7 @@ package com.xcodersteam.cpue
 import com.xcodersteam.cpue.Simulation.UpdateListener
 import com.xcodersteam.cpue.simulation.Link
 import com.xcodersteam.cpue.simulation.Node
+import com.xcodersteam.cpue.simulation.RefNode
 import com.xcodersteam.cpue.simulation.Transistor
 
 /**
@@ -24,6 +25,11 @@ object Simulation {
     fun node(): Node {
         val node = Node()
         allNodes.add(node)
+        return node
+    }
+
+    fun refNode(): Node {
+        val node = RefNode()
         return node
     }
 

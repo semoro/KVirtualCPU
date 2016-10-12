@@ -1,7 +1,6 @@
 package com.xcodersteam.cpue.blocks
 
 import com.xcodersteam.cpue.AbstractSimulationTest
-import com.xcodersteam.cpue.Simulation.power
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -13,51 +12,44 @@ class SubtractorTest : AbstractSimulationTest() {
     @Test
     fun testHalfSubtractor() {
 
-        val truthTable = truthTable(
-                arrayOf(0, 0) to arrayOf(0, 0),
-                arrayOf(1, 0) to arrayOf(1, 0),
-                arrayOf(0, 1) to arrayOf(1, 1),
-                arrayOf(1, 1) to arrayOf(0, 0)
-        )
+        truthTable(2, 2,
+                0b00 to 0b00,
+                0b01 to 0b11,
+                0b10 to 0b10,
+                0b11 to 0b00
+        ).setup {
+            val subtractor = HalfSubtractor()
+            subtractor.x.link(inputs.nodes[0])
+            subtractor.y.link(inputs.nodes[1])
+            subtractor.d.link(outputs.nodes[0])
+            subtractor.b.link(outputs.nodes[1])
+        }.test(this, 10)
 
-        val subtractor = HalfSubtractor()
-        simulateNSteps(10) {}
-        truthTable.test {
-            simulateNSteps(4) {
-                subtractor.x1.power = inputs[0]
-                subtractor.x2.power = inputs[1]
-            }
-            assertEquals(outputs[0], subtractor.d.power)
-            assertEquals(outputs[1], subtractor.bOut.power)
-        }
+
 
     }
 
     @Test
     fun testFullSubtractor() {
-        val truthTable = truthTable(
-                arrayOf(0, 0, 0) to arrayOf(0, 0),
-                arrayOf(0, 0, 1) to arrayOf(1, 0),
-                arrayOf(0, 1, 0) to arrayOf(1, 1),
-                arrayOf(0, 1, 1) to arrayOf(0, 0),
-                arrayOf(1, 0, 0) to arrayOf(1, 1),
-                arrayOf(1, 0, 1) to arrayOf(0, 0),
-                arrayOf(1, 1, 0) to arrayOf(0, 1),
-                arrayOf(1, 1, 1) to arrayOf(1, 1)
-        )
-
         val subtractor = FullSubtractor()
-        simulateNSteps(10) {}
+        truthTable(3, 2,
+                0b000 to 0b00,
+                0b001 to 0b11,
+                0b010 to 0b11,
+                0b011 to 0b01,
+                0b100 to 0b10,
+                0b101 to 0b00,
+                0b110 to 0b00,
+                0b111 to 0b11
+        ).setup {
+            subtractor.x1.link(inputs.nodes[0])
+            subtractor.x2.link(inputs.nodes[1])
+            subtractor.bIn.link(inputs.nodes[2])
 
-        truthTable.test {
-            simulateNSteps(7) {
-                subtractor.x1.power = inputs[2]
-                subtractor.x2.power = inputs[1]
-                subtractor.bIn.power = inputs[0]
-            }
-            assertEquals(outputs[0], subtractor.d.power)
-            assertEquals(outputs[1], subtractor.bOut.power)
-        }
+            subtractor.d.link(outputs.nodes[0])
+            subtractor.bOut.link(outputs.nodes[1])
+        }.test(this, 7)
+
     }
 
     @Test

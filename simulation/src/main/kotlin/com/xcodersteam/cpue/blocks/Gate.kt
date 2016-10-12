@@ -2,7 +2,7 @@ package com.xcodersteam.cpue.blocks
 
 import com.xcodersteam.cpue.Simulation
 import com.xcodersteam.cpue.Simulation.VCC
-import com.xcodersteam.cpue.Simulation.node
+import com.xcodersteam.cpue.Simulation.refNode
 import com.xcodersteam.cpue.Simulation.transistor
 import com.xcodersteam.cpue.simulation.Transistor.SiliconType
 
@@ -12,31 +12,27 @@ import com.xcodersteam.cpue.simulation.Transistor.SiliconType
  */
 
 class ANDGate {
-    val t1 = transistor(SiliconType.N)
-    val t2 = transistor(SiliconType.N)
 
-    val a = t1.gate
-    val b = t2.gate
-
-    val c = t2.drain
+    val a = refNode()
+    val b = refNode()
+    val c = refNode()
 
     init {
-        t1.source.link(Simulation.VCC)
-        t2.source.link(t1.drain)
+        c.link((VCC uand a) uand b)
     }
 }
 
 class MultiANDGate(val bits: Int) {
-    val transistors = Array(bits, { transistor(SiliconType.N) })
-    val input = ArrayBasedBus(transistors.map { it.gate }.toTypedArray())
-    val output = transistors.last().drain
+
+    val input = ArrayBasedBus(Array(bits) { refNode() })
+    val output = refNode()
 
     init {
-        var source = VCC
-        transistors.forEach {
-            it.source.link(source)
-            source = it.drain
+        var prevNode = VCC
+        input.nodes.forEach {
+            prevNode = (prevNode uand it)
         }
+        output.link(prevNode)
     }
 }
 
@@ -56,55 +52,44 @@ class NANDGate {
 }
 
 class ORGate {
-    val t1 = transistor(SiliconType.N)
-    val t2 = transistor(SiliconType.N)
+    val a = refNode()
+    val b = refNode()
 
-    val a = t1.gate
-    val b = t2.gate
-
-
-    val c = node()
+    val c = refNode()
 
     init {
-        t1.source.link(Simulation.VCC)
-        t2.source.link(Simulation.VCC)
-        c.link(t1.drain)
-        c.link(t2.drain)
+        c.link(VCC uand a)
+        c.link(VCC uand b)
     }
 }
 
 class NORGate {
-    val not = NotGate()
-    val or = ORGate()
+    val a = refNode()
+    val b = refNode()
 
-    val a = or.a
-    val b = or.b
-
-    val c = not.b
+    val c = refNode()
 
     init {
-        not.a.link(or.c)
+        c.link(not(a or b))
     }
 }
 
 
-class MultiOrGate(val bits: Int) {
-    val transistors = Array(bits, { transistor(SiliconType.N) })
-    val input = ArrayBasedBus(transistors.map { it.gate }.toTypedArray())
-    val output = node()
+class MultiORGate(val bits: Int) {
+    val input = ArrayBasedBus(Array(bits, { refNode() }))
+    val output = refNode()
 
     init {
-        transistors.forEach {
-            it.source.link(VCC)
-            it.drain.link(output)
+        input.nodes.forEach {
+            output.link(VCC uand it)
         }
     }
 }
 
 class NotGate {
-    val t1 = transistor(SiliconType.P)
-
+    private val t1 = transistor(SiliconType.P)
     val a = t1.gate
+
     val b = t1.drain
 
     init {
@@ -113,64 +98,48 @@ class NotGate {
 }
 
 class XORGate {
-    val andGate = ANDGate()
-    val orGate = ORGate()
-    val nandGate = NANDGate()
 
-    val a = node()
-    val b = node()
-    val c = andGate.c
+
+    val a = refNode()
+    val b = refNode()
+
+    val c = refNode()
 
     init {
-        orGate.a.link(a)
-        orGate.b.link(b)
-        nandGate.a.link(a)
-        nandGate.b.link(b)
-        andGate.a.link(orGate.c)
-        andGate.b.link(nandGate.c)
+        c.link((a or b) and (a nand b))
     }
 }
 
 class XNORGate {
-    val outGate = NANDGate()
-    val orGate = ORGate()
-    val nandGate = NANDGate()
 
-    val a = node()
-    val b = node()
-    val c = outGate.c
+    val a = refNode()
+    val b = refNode()
+
+    val c = refNode()
 
     init {
-        orGate.a.link(a)
-        orGate.b.link(b)
-        nandGate.a.link(a)
-        nandGate.b.link(b)
-        outGate.a.link(orGate.c)
-        outGate.b.link(nandGate.c)
+        c.link((a or b) nand (a nand b))
     }
 }
 
 class RSLatch {
-    val resetControl = transistor(SiliconType.P)
-    val dataT = transistor(SiliconType.N)
 
-    val q = dataT.drain
-    val s = dataT.gate
-    val r = resetControl.gate
+    val q = refNode()
+    val s = refNode()
+    val r = refNode()
 
     init {
-        dataT.source.link(VCC)
-        resetControl.source.link(dataT.drain)
-        dataT.gate.link(resetControl.drain)
+        q.link((VCC uxnand r) uand s)
+        q.link(s)
     }
 }
 
 class TDiode {
-    val transistor = transistor(SiliconType.N)
-    val a = transistor.gate
-    val b = transistor.drain
+
+    val a = refNode()
+    val b = refNode()
 
     init {
-        a.link(transistor.source)
+        b.link(VCC uand a)
     }
 }

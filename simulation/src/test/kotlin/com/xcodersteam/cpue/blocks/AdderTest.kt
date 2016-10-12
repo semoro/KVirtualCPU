@@ -1,8 +1,7 @@
 package com.xcodersteam.cpue.blocks
 
 import com.xcodersteam.cpue.AbstractSimulationTest
-import com.xcodersteam.cpue.Simulation.power
-import org.junit.Assert.*
+import org.hamcrest.CoreMatchers.equalTo
 import org.junit.Test
 
 /**
@@ -14,66 +13,39 @@ class AdderTest : AbstractSimulationTest() {
     @Test
     fun testHalfAdder() {
         val adder = HalfAdder()
-        simulateNSteps(10) {}
-        assertFalse(adder.s.power)
-        assertFalse(adder.c.power)
 
-        simulateNSteps(4) {
-            adder.x1.power = true
-        }
-        assertTrue(adder.s.power)
-        assertFalse(adder.c.power)
-
-        simulateNSteps(4) {
-            adder.x2.power = true
-        }
-        assertTrue(adder.s.power)
-        assertFalse(adder.c.power)
-
-        simulateNSteps(4) {
-            adder.x1.power = true
-            adder.x2.power = true
-        }
-        assertFalse(adder.s.power)
-        assertTrue(adder.c.power)
+        truthTable(2, 2,
+                0b00 to 0b00,
+                0b10 to 0b01,
+                0b01 to 0b01,
+                0b11 to 0b10
+        ).setup {
+            adder.a.link(inputs.nodes[0])
+            adder.b.link(inputs.nodes[1])
+            adder.c.link(outputs.nodes[0])
+            adder.s.link(outputs.nodes[1])
+        }.test(this, 10)
     }
 
     @Test
     fun testFullAdder() {
         val adder = FullAdder()
-        simulateNSteps(10) {}
-        assertFalse(adder.s.power)
-        assertFalse(adder.cOut.power)
-
-        simulateNSteps(7) {
-            adder.x1.power = true
-        }
-        assertTrue(adder.s.power)
-        assertFalse(adder.cOut.power)
-        simulateNSteps(10) {}
-
-        simulateNSteps(7) {
-            adder.x2.power = true
-        }
-        assertTrue(adder.s.power)
-        assertFalse(adder.cOut.power)
-        simulateNSteps(10) {}
-
-        simulateNSteps(7) {
-            adder.x1.power = true
-            adder.x2.power = true
-        }
-        assertFalse(adder.s.power)
-        assertTrue(adder.cOut.power)
-        simulateNSteps(10) {}
-
-        simulateNSteps(7) {
-            adder.x1.power = true
-            adder.x2.power = true
-            adder.cIn.power = true
-        }
-        assertTrue(adder.s.power)
-        assertTrue(adder.cOut.power)
+        truthTable(3, 2,
+                0b000 to 0b00,
+                0b001 to 0b01,
+                0b010 to 0b01,
+                0b011 to 0b10,
+                0b100 to 0b01,
+                0b101 to 0b10,
+                0b110 to 0b10,
+                0b111 to 0b11
+        ).setup {
+            adder.a.link(inputs.nodes[0])
+            adder.b.link(inputs.nodes[1])
+            adder.cIn.link(inputs.nodes[2])
+            adder.cOut.link(outputs.nodes[0])
+            adder.s.link(outputs.nodes[1])
+        }.test(this, 10)
     }
 
     @Test
@@ -91,7 +63,7 @@ class AdderTest : AbstractSimulationTest() {
                     summer.x1.asBits = i
                     summer.x2.asBits = j
                 }
-                assertEquals((i + j) % (1 shl summer.bits), summer.s.asBits)
+                collector.checkThat(summer.s.asBits, equalTo((i + j) % (1 shl summer.bits)), "$i + $j")
             }
     }
 }
