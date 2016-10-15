@@ -10,71 +10,96 @@ import com.xcodersteam.cpue.simulation.Transistor
  */
 
 fun Node.diodeLink(other: Node): TDiode {
-    val diode = TDiode()
-    diode.a.link(this)
-    diode.b.link(other)
-    return diode
+    TDiode().let {
+        it.a.link(this)
+        it.b.link(other)
+        return it
+    }
+}
+
+fun diode(node: Node): Node {
+    TDiode().let {
+        it.a.link(node)
+        return it.b
+    }
 }
 
 fun not(other: Node): Node {
-    val notGate = NotGate()
-    notGate.a.link(other)
-    return notGate.b
+    NotGate().let {
+        it.a.link(other)
+        return it.b
+    }
 }
 
 infix fun Node.or(other: Node): Node {
-    val orGate = ORGate()
-    orGate.a.link(this)
-    orGate.b.link(other)
-    return orGate.c
+    ORGate().let {
+        it.a.link(this)
+        it.b.link(other)
+        return it.c
+    }
+}
+
+infix fun Node.nor(other: Node): Node {
+    NORGate().let {
+        it.a.link(this)
+        it.b.link(other)
+        return it.c
+    }
 }
 
 infix fun Node.and(other: Node): Node {
-    val andGate = ANDGate()
-    andGate.a.link(this)
-    andGate.b.link(other)
-    return andGate.c
+    ANDGate().let {
+        it.a.link(this)
+        it.b.link(other)
+        return it.c
+    }
 }
 
 infix fun Node.nand(other: Node): Node {
-    val nandGate = NANDGate()
-    nandGate.a.link(this)
-    nandGate.b.link(other)
-    return nandGate.c
+    NANDGate().let {
+        it.a.link(this)
+        it.b.link(other)
+        return it.c
+    }
 }
 
 infix fun Node.uand(other: Node): Node {
-    val t = Simulation.transistor(Transistor.SiliconType.N)
-    t.source.link(this)
-    t.gate.link(other)
-    return t.drain
+    Simulation.transistor(Transistor.SiliconType.N).let {
+        it.source.link(this)
+        it.gate.link(other)
+        return it.drain
+    }
 }
 
 infix fun Node.uxnand(other: Node): Node {
-    val t = Simulation.transistor(Transistor.SiliconType.P)
-    t.source.link(this)
-    t.gate.link(other)
-    return t.drain
+    Simulation.transistor(Transistor.SiliconType.P).let {
+        it.source.link(this)
+        it.gate.link(other)
+        return it.drain
+    }
 }
 
 
 infix fun Node.ruand(other: Node): Node {
-    val t = Simulation.transistor(Transistor.SiliconType.N)
-    t.source.link(other)
-    t.gate.link(this)
-    return t.drain
+    Simulation.transistor(Transistor.SiliconType.N).let {
+        it.source.link(other)
+        it.gate.link(this)
+        return it.drain
+    }
 }
 
 infix fun Node.xor(other: Node): Node {
-    val gate = XORGate()
-    gate.a.link(this)
-    gate.b.link(other)
-    return gate.c
+    XORGate().let {
+        it.a.link(this)
+        it.b.link(other)
+        return it.c
+    }
 }
 
 infix fun Node.xnor(other: Node): Node {
-    val gate = XNORGate()
-    gate.a.link(this)
-    gate.b.link(other)
-    return gate.c
+    XNORGate().let {
+        it.a.link(this)
+        it.b.link(other)
+        return it.c
+    }
 }

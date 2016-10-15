@@ -1,5 +1,8 @@
-package com.xcodersteam.cpue.kcpu1
+package com.xcodersteam.cpue.kcpu1.complex
 
+import com.xcodersteam.cpue.kcpu1.JUMP_A
+import com.xcodersteam.cpue.kcpu1.asm
+import com.xcodersteam.cpue.kcpu1.reg
 import junit.framework.TestCase.assertEquals
 import org.junit.Test
 

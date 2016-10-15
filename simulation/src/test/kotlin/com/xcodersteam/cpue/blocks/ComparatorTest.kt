@@ -38,7 +38,7 @@ class ComparatorTest : AbstractSimulationTest() {
         val cmp = Comparator(8)
         for (i in 0..255) {
             for (j in 0..255) {
-                simulateNSteps(8) {
+                simulateNSteps(9) {
                     cmp.a.asBits = i
                     cmp.b.asBits = j
                 }

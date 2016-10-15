@@ -1,10 +1,11 @@
-package com.xcodersteam.cpue.kcpu1
+package com.xcodersteam.cpue.kcpu1.complex
 
 import com.xcodersteam.cpue.AbstractSimulationTest
 import com.xcodersteam.cpue.blocks.ArrayBasedBus
 import com.xcodersteam.cpue.kcpu1.blocks.KCPU
 import com.xcodersteam.cpue.kcpu1.dummy.DummyROM
 import com.xcodersteam.cpue.kcpu1.dummy.DummyROMChip
+import com.xcodersteam.cpue.kcpu1.mainBus
 import org.junit.Before
 
 /**

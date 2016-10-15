@@ -1,7 +1,7 @@
 package com.xcodersteam.cpue.kcpu1.blocks
 
 import com.xcodersteam.cpue.Simulation.VCC
-import com.xcodersteam.cpue.Simulation.node
+import com.xcodersteam.cpue.Simulation.refNode
 import com.xcodersteam.cpue.blocks.*
 import com.xcodersteam.cpue.kcpu1.JUMP_A
 import com.xcodersteam.cpue.kcpu1.JUMP_H
@@ -20,8 +20,8 @@ class JumpRegister(val programCounter: ProgramCounter) {
     val shouldJumpFlag = RSLatch()
     val shouldCheckFlag = RSLatch()
 
-    val flagPhase = node()
-    val jumpPhase = node()
+    val flagPhase = refNode()
+    val jumpPhase = refNode()
     val resetPhase = shouldJumpFlag.r
 
     val mainBusConnector = MainBusConnectorImpl()

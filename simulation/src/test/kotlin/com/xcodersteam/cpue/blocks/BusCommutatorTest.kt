@@ -70,5 +70,19 @@ class BusCommutatorTest : AbstractSimulationTest() {
             }
             collector.checkThat(commutator.busA.asBits, equalTo(i))
         }
+        for (i in 0..255) {
+            simulateNSteps(5) {
+                commutator.busA.asBits = i
+                commutator.dirB.power = true
+            }
+            collector.checkThat(commutator.busB.asBits, equalTo(0))
+        }
+        for (i in 0..255) {
+            simulateNSteps(5) {
+                commutator.busB.asBits = i
+                commutator.dirA.power = true
+            }
+            collector.checkThat(commutator.busA.asBits, equalTo(0))
+        }
     }
 }

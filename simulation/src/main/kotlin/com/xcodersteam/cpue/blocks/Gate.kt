@@ -38,16 +38,14 @@ class MultiANDGate(val bits: Int) {
 
 
 class NANDGate {
-    val andGate = ANDGate()
-    val notGate = NotGate()
 
-    val a = andGate.a
-    val b = andGate.b
+    val a = refNode()
+    val b = refNode()
 
-    val c = notGate.b
+    val c = refNode()
 
     init {
-        andGate.c.link(notGate.a)
+        c.link(not(a uand b))
     }
 }
 
@@ -98,7 +96,6 @@ class NotGate {
 }
 
 class XORGate {
-
 
     val a = refNode()
     val b = refNode()

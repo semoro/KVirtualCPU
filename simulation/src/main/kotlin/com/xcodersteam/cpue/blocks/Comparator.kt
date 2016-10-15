@@ -1,6 +1,6 @@
 package com.xcodersteam.cpue.blocks
 
-import com.xcodersteam.cpue.Simulation.node
+import com.xcodersteam.cpue.Simulation.refNode
 
 /**
  * Created by Semoro on 24.09.16.
@@ -23,10 +23,12 @@ class EqualityComparator(val bits: Int) {
 }
 
 
-//Max timing: 8t
+//Max timing: 9t
 //Equality check: 6t
-//Less check: 3t
+//Lesser check: 3t
+//Lesser equal check: 7t
 //Greater check: 8t
+//Greater equal check: 9t
 class Comparator(val bits: Int) {
 
     val equalCmp = EqualityComparator(bits)
@@ -39,17 +41,12 @@ class Comparator(val bits: Int) {
     val a = ArrayBasedBus(nots.map { it.a }.toTypedArray())
     val b = ArrayBasedBus(andGates.map { it.input.nodes[1] }.toTypedArray())
 
-    val norGt = NORGate()
-
-    val lesser = node()
+    val lesser = refNode()
     val equal = equalCmp.out
-    val greater = norGt.c
+    val greater = refNode()
 
-    val orGt = ORGate()
-    val greaterEqual = orGt.c
-
-    val orLq = ORGate()
-    val lesserEqual = orLq.c
+    val greaterEqual = refNode()
+    val lesserEqual = refNode()
 
     init {
         andGates.forEachIndexed { i, gate ->
@@ -64,13 +61,9 @@ class Comparator(val bits: Int) {
         }
         andGates.map { it.output }.forEach { it.link(lesser) }
 
-        norGt.a.link(lesser)
-        norGt.b.link(equal)
 
-        orGt.a.link(equal)
-        orGt.b.link(greater)
-
-        orLq.a.link(equal)
-        orLq.b.link(lesser)
+        lesserEqual.link(lesser or equal)
+        greater.link(not(lesserEqual))
+        greaterEqual.link(greater or equal)
     }
 }

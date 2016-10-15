@@ -1,7 +1,7 @@
 package com.xcodersteam.cpue.blocks
 
 import com.xcodersteam.cpue.Simulation
-import com.xcodersteam.cpue.Simulation.node
+import com.xcodersteam.cpue.Simulation.refNode
 import com.xcodersteam.cpue.Simulation.transistor
 import com.xcodersteam.cpue.simulation.Transistor.SiliconType
 
@@ -12,7 +12,7 @@ import com.xcodersteam.cpue.simulation.Transistor.SiliconType
 class MemoryLine(val bits: Int) {
     val latches = Array(bits, { RSLatch() })
 
-    val r = node()
+    val r = refNode()
 
     val inNodes = latches.map { it.s }.toTypedArray()
     val inBus = ArrayBasedBus(inNodes)
@@ -46,11 +46,11 @@ class AddressMatcher(val bits: Int, val address: Int) {
 
 class MemoryBlock(val addressBits: Int, val dataBits: Int, startAddress: Int, size: Int) {
 
-    val s = node()
-    val r = node()
+    val s = refNode()
+    val r = refNode()
 
-    val addressBus = NodesBus(addressBits)
-    val dataBus = NodesBus(dataBits)
+    val addressBus = RefNodesBus(addressBits)
+    val dataBus = RefNodesBus(dataBits)
 
 
     class MemoryRow(addressBus: AbstractBus, dataBus: AbstractBus, address: Int) {

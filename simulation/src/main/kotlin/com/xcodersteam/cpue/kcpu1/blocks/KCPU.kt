@@ -1,6 +1,6 @@
 package com.xcodersteam.cpue.kcpu1.blocks
 
-import com.xcodersteam.cpue.Simulation.node
+import com.xcodersteam.cpue.Simulation.refNode
 import com.xcodersteam.cpue.blocks.*
 import com.xcodersteam.cpue.kcpu1.ALU_GROUP
 import com.xcodersteam.cpue.simulation.Node
@@ -27,18 +27,18 @@ interface MainBusConnector {
 }
 
 class MainBusConnectorImpl : MainBusConnector {
-    override val addressBus: AbstractBus = NodesBus(8)
-    override val dataBus: AbstractBus = NodesBus(8)
-    override val set: Node = node()
-    override val read: Node = node()
-    override val reset: Node = node()
+    override val addressBus: AbstractBus = RefNodesBus(8)
+    override val dataBus: AbstractBus = RefNodesBus(8)
+    override val set: Node = refNode()
+    override val read: Node = refNode()
+    override val reset: Node = refNode()
 }
 
 class KCPU {
     val programCounter = ProgramCounter()
     val accumulator = MemoryLine(8)
 
-    val phases = Array(8, { node() })
+    val phases = Array(8, { refNode() })
     val mainBus = MainBusConnectorImpl()
 
     val argACommutator = BusCommutator(8)

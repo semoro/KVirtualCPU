@@ -2,9 +2,8 @@ package com.xcodersteam.cpue.blocks
 
 import com.sun.javaws.exceptions.InvalidArgumentException
 import com.xcodersteam.cpue.Simulation
-import com.xcodersteam.cpue.Simulation.node
 import com.xcodersteam.cpue.Simulation.power
-import com.xcodersteam.cpue.Simulation.transistor
+import com.xcodersteam.cpue.Simulation.refNode
 import com.xcodersteam.cpue.simulation.Node
 import com.xcodersteam.cpue.simulation.Transistor.SiliconType
 
@@ -41,6 +40,10 @@ fun NodesBus(bits: Int): ArrayBasedBus {
     return ArrayBasedBus(Array(bits, { Simulation.node() }))
 }
 
+fun RefNodesBus(bits: Int): ArrayBasedBus {
+    return ArrayBasedBus(Array(bits, { Simulation.refNode() }))
+}
+
 class BusCommutator(bits: Int) {
 
     val transistors = Array(bits, { i ->
@@ -57,35 +60,28 @@ class BusCommutator(bits: Int) {
 }
 
 class SingleBiCommutator() {
-    val transistorAtoB = transistor(SiliconType.N)
-    val transistorBtoA = transistor(SiliconType.N)
-    val diodeAtoB = TDiode()
-    val diodeBtoA = TDiode()
 
-    val a = transistorAtoB.gate
-    val b = transistorBtoA.gate
+    val a = refNode()
+    val b = refNode()
 
-    val aToB = diodeAtoB.a
-    val bToA = diodeBtoA.a
+    val aToB = refNode()
+    val bToA = refNode()
 
     init {
-        transistorAtoB.drain.link(b)
-        transistorAtoB.source.link(diodeAtoB.b)
-
-        transistorBtoA.drain.link(a)
-        transistorBtoA.source.link(diodeBtoA.b)
+        b.link(diode(aToB) uand a)
+        a.link(diode(bToA) uand b)
     }
 }
 
 class BiBusCommutator(bits: Int) {
 
-    val commutators = Array(bits, { SingleBiCommutator() })
+    private val commutators = Array(bits, { SingleBiCommutator() })
 
     val busA = ArrayBasedBus(commutators.map { it.a }.toTypedArray())
     val busB = ArrayBasedBus(commutators.map { it.b }.toTypedArray())
 
-    val dirA = node()
-    val dirB = node()
+    val dirA = refNode()
+    val dirB = refNode()
 
     init {
         commutators.map { it.aToB }.forEach { it.link(dirA) }
