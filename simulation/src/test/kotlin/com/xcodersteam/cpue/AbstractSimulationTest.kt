@@ -75,7 +75,7 @@ abstract class AbstractSimulationTest {
     }
 
 
-    fun simulateNSteps(steps: Int, e: Simulation.() -> Unit) {
+    fun simulateNSteps(steps: Int, e: Simulation.() -> Unit = {}) {
         for (i in 1..steps) {
             Simulation.simulationStep(e)
             logicAnalyzer.update(tick++)

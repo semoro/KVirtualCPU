@@ -2,7 +2,7 @@ package com.xcodersteam.cpue.simulation
 
 import sun.plugin.dom.exception.InvalidStateException
 
-class RefNode : Node() {
+open class RefNode : Node() {
     var ref: Node? = null
 
     override var isPowered: Boolean

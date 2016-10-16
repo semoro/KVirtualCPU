@@ -11,9 +11,7 @@ class DummyControlTrigger {
 
     var triggerState = false
 
-    open class DCTNode : Node() {
-
-    }
+    open class DCTNode : Node()
 
     val source: Node = object : DCTNode() {
         override fun onPowerChange(from: Node?) {
